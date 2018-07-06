@@ -49,9 +49,9 @@ namespace Sitecore.Support.Data
         private SafeDictionary<ID, string> GetStandardValuesFromCache(Item item)
         {
             StandardValuesCache standardValuesCache = item.Database.Caches.StandardValuesCache;
-            if (item.IsFallback)
-                return standardValuesCache.GetStandardValues(item.GetFallbackItem());
-            return standardValuesCache.GetStandardValues(item);
+            if (item.IsFallback & LanguageFallbackItemSwitcher.CurrentValue == null)
+                return item.Database.Caches.StandardValuesCache.GetStandardValues(item.GetFallbackItem());
+            return item.Database.Caches.StandardValuesCache.GetStandardValues(item);
 
         }
 
