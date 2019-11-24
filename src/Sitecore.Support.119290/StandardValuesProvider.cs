@@ -57,10 +57,10 @@ namespace Sitecore.Support.Data
             StandardValuesCache standardValuesCache = item.Database.Caches.StandardValuesCache;
 
             #region Bug# 119290 Modified code
-            if (item.IsFallback & LanguageFallbackItemSwitcher.CurrentValue == null)
+            if (item.IsFallback && LanguageFallbackItemSwitcher.CurrentValue == null)
             {
                 Item tempItem = item.GetFallbackItem();
-                while (Sitecore.Context.Database.GetItem(tempItem.ID, tempItem.Language) == null)
+                while (tempItem != null && Sitecore.Context.Database.GetItem(tempItem.ID, tempItem.Language) == null)
                 {
                     if (tempItem.GetFallbackItem() != null)
                     {
@@ -71,7 +71,7 @@ namespace Sitecore.Support.Data
                         break;
                     }
                 }
-                int count = tempItem.Versions.Count;
+         //       int count = tempItem.Versions.Count;
                 return item.Database.Caches.StandardValuesCache.GetStandardValues(tempItem);
             }
             #endregion
