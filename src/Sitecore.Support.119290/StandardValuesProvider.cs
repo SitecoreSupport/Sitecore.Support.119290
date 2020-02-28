@@ -10,6 +10,7 @@ using Sitecore.Data.Templates;
 using Sitecore.Diagnostics;
 using Sitecore.Globalization;
 using Sitecore.SecurityModel;
+using System;
 
 namespace Sitecore.Support.Data
 {
@@ -21,11 +22,6 @@ namespace Sitecore.Support.Data
             if (field.ID == FieldIDs.SourceItem || field.ID == FieldIDs.Source)
             {
                 return string.Empty;
-            }
-
-            if (field.Name == "F1")
-            {
-                string name = field.Name;
             }
 
             SafeDictionary<ID, string> standardValues = this.GetStandardValues(field.Item);
@@ -59,26 +55,16 @@ namespace Sitecore.Support.Data
             #region Bug# 119290 Modified code
             if (item.IsFallback && LanguageFallbackItemSwitcher.CurrentValue == null)
             {
-                Item tempItem = item.GetFallbackItem();
-                while (tempItem != null && Sitecore.Context.Database.GetItem(tempItem.ID, tempItem.Language) == null)
+                Item fallbackItem = item.GetFallbackItem();
+                while (fallbackItem != null && fallbackItem.GetFallbackItem() != null && Context.Database.GetItem(fallbackItem.ID, fallbackItem.Language) == null)
                 {
-                    if (tempItem.GetFallbackItem() != null)
-                    {
-                        tempItem = tempItem.GetFallbackItem();
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    fallbackItem = fallbackItem.GetFallbackItem();
                 }
-         //       int count = tempItem.Versions.Count;
-                return item.Database.Caches.StandardValuesCache.GetStandardValues(tempItem);
+                return item.Database.Caches.StandardValuesCache.GetStandardValues(fallbackItem ?? item);
             }
             #endregion
 
-
             return item.Database.Caches.StandardValuesCache.GetStandardValues(item);
-
         }
 
         private void AddStandardValuesToCache(Item item, SafeDictionary<ID, string> values)
